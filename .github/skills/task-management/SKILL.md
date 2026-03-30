@@ -58,11 +58,20 @@ The board is the only source of truth. Keep it current at all times:
 
 ## Compacting Completed Tasks
 
-When a task is done, replace its full entry with a single line below `--- DONE ---`:
+When a task is marked done, **two edits** must happen in `tasks/BACKLOG.md`:
+
+1. **Delete** the full task block (header + all bullet fields) from the
+   `## Open Tasks` section.
+2. **Append** a single compact line to the `## Completed` section
+   (below the `--- DONE ---` divider):
 
 ```markdown
 - **TASK-XXX:** [Title] — [1-line result summary] | tasks/done/TASK-XXX.md
 ```
+
+Both edits happen in one board write — never leave a done task in the Open
+section. If the `## Completed` section or `--- DONE ---` divider does not
+exist yet, create it at the bottom of the file before appending.
 
 This keeps the board small. The full result is preserved in `tasks/done/TASK-XXX.md`
 (written by the subagent) and in git history.

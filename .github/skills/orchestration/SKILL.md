@@ -28,6 +28,8 @@ written to `tasks/BACKLOG.md` before the loop continues. Do not defer or skip
 board updates to save steps — an unwritten update did not happen.
 
 ```
+completed_count = 0   # tracks tasks done this session for /observe checkpoints
+
 LOOP:
   tasks = read_board() → filter(status=open, not blocked)
   if empty(tasks):
@@ -56,9 +58,10 @@ LOOP:
     decisions  = extract decisions / risks from report
     role_gaps  = note any constraints the task revealed
 
-    WRITE board: task.status = done, result = summarize(report.summary)
-    WRITE board: compact line links tasks/done/{task.id}.md
-    WRITE board: create + prioritize follow_ups as new tasks
+    WRITE board: remove full task entry from the Open Tasks section
+    WRITE board: append compact done line to the Completed section
+                 (below the `--- DONE ---` divider; see /task-management skill)
+    WRITE board: create + prioritize follow_ups as new open tasks
     WRITE board: unblock dependent tasks      # see /collaboration skill for rules
     if role_gaps → update role file           # see /role-creation § Revisiting a Role
     if decisions → log in .github/roles/README.md Decision Log
@@ -69,6 +72,13 @@ LOOP:
     git commit -m "feat({task.id}): {task.title}"
     # One commit per task. Never use git add -A (may capture parallel work).
     # ─────────────────────────────────────────────────────────────────
+
+    completed_count += 1
+
+  # ── Observe checkpoint (every 5 completed tasks) ──────────────────
+  if completed_count % 5 == 0:
+    run_observe()   # see /observe skill — re-read GOAL.md, gap analysis,
+                    # create/reprioritize/retire tasks as needed
   # ───────────────────────────────────────────────────────────────────
 
   CONTINUE LOOP
